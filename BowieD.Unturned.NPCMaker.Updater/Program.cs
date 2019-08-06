@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
@@ -9,32 +10,14 @@ namespace BowieD.Unturned.NPCMaker.Updater
 {
     class Program
     {
-        private const string url = @"https://api.github.com/repos/iBowie/BowieD.Unturned.NPCMaker/releases/latest";
         public static UpdateManifest? GetUpdateManifest()
         {
-            ServicePointManager.Expect100Continue = false;
-            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
-            httpRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
-            var respStream = httpRequest.GetResponse().GetResponseStream();
-            if (respStream == null)
-                return null;
-            UpdateManifest result = new UpdateManifest();
-            using (var reader = new StreamReader(respStream))
+            try
             {
-                var jsonData = reader.ReadToEnd();
-                var jsonObj = JObject.Parse(jsonData);
-                var latestVersionTag = jsonObj.GetValue("tag_name");
-
-                if (latestVersionTag == null)
-                    return result;
-                result.newVersion = latestVersionTag.ToString();
-                var assets = jsonObj.GetValue("assets").Children<JObject>();
-                string downloadUrl = assets.First().GetValue("browser_download_url")?.ToString() ?? "null";
-                if (downloadUrl == "null")
-                    return result;
-                result.downloadUrl = downloadUrl;
+                string content = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "update.manifest");
+                return JsonConvert.DeserializeObject<UpdateManifest>(content);
             }
-            return result;
+            catch { return null; }
         }
         static void Main(string[] args)
         {
@@ -53,9 +36,9 @@ namespace BowieD.Unturned.NPCMaker.Updater
                     var manifest = GetUpdateManifest();
                     if (manifest == null)
                         WriteLine($"FAILED: Could not get anything.", ConsoleColor.Red);
-                    else if (manifest?.newVersion == null)
+                    else if (manifest?.tag_name == null)
                         WriteLine($"FAILED: Could not get version info.", ConsoleColor.Red);
-                    else if (manifest?.downloadUrl == null)
+                    else if (manifest?.assets[0].browser_download_url == null)
                         WriteLine($"FAILED: Could not get download URL.", ConsoleColor.Red);
                     else
                     {
@@ -69,7 +52,7 @@ namespace BowieD.Unturned.NPCMaker.Updater
                         WriteLine($"Downloading new version...", ConsoleColor.White);
                         using (WebClient client = new WebClient())
                         {
-                            client.DownloadFile(manifest?.downloadUrl, args[0]);
+                            client.DownloadFile(manifest?.assets[0].browser_download_url, args[0]);
                         }
                         WriteLine($"Downloaded!", ConsoleColor.White);
                         WriteLine($"Launching in 3...", ConsoleColor.White);
@@ -103,7 +86,13 @@ namespace BowieD.Unturned.NPCMaker.Updater
     }
     public struct UpdateManifest
     {
-        public string newVersion;
-        public string downloadUrl;
+        public string name;
+        public string tag_name;
+        public string body;
+        public asset[] assets;
+        public class asset
+        {
+            public string browser_download_url;
+        }
     }
 }
