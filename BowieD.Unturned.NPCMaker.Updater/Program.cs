@@ -21,12 +21,11 @@ namespace BowieD.Unturned.NPCMaker.Updater
         }
         static void Main(string[] args)
         {
-            if (args.Length < 1/* || !File.Exists(args[0])*/)
+            if (args.Length < 1 || !File.Exists(args[0]))
             {
-                args = new string[1] { @"K:\VS Repository\BowieD.Unturned.NPCMaker\BowieD.Unturned.NPCMaker\bin\Debug\BowieD.Unturned.NPCMaker.exe" };
-                //WriteLine($"ILLEGAL ARGUMENTS. CLOSING...", ConsoleColor.Red);
-                //Thread.Sleep(3000);
-                //return;
+                WriteLine($"ILLEGAL ARGUMENTS. CLOSING...", ConsoleColor.Red);
+                Thread.Sleep(3000);
+                return;
             }
             for (int k = 0; k < 10; k++)
             {
