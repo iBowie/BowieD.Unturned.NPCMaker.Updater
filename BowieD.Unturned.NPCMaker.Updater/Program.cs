@@ -12,6 +12,7 @@ namespace BowieD.Unturned.NPCMaker.Updater
         private const string url = @"https://api.github.com/repos/iBowie/BowieD.Unturned.NPCMaker/releases/latest";
         public static UpdateManifest? GetUpdateManifest()
         {
+            ServicePointManager.Expect100Continue = false;
             HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
             httpRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
             var respStream = httpRequest.GetResponse().GetResponseStream();
