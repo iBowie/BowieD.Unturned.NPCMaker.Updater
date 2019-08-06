@@ -21,11 +21,12 @@ namespace BowieD.Unturned.NPCMaker.Updater
         }
         static void Main(string[] args)
         {
-            if (args.Length < 1 || !File.Exists(args[0]))
+            if (args.Length < 1/* || !File.Exists(args[0])*/)
             {
-                WriteLine($"ILLEGAL ARGUMENTS. CLOSING...", ConsoleColor.Red);
-                Thread.Sleep(3000);
-                return;
+                args = new string[1] { @"K:\VS Repository\BowieD.Unturned.NPCMaker\BowieD.Unturned.NPCMaker\bin\Debug\BowieD.Unturned.NPCMaker.exe" };
+                //WriteLine($"ILLEGAL ARGUMENTS. CLOSING...", ConsoleColor.Red);
+                //Thread.Sleep(3000);
+                //return;
             }
             for (int k = 0; k < 10; k++)
             {
@@ -52,15 +53,9 @@ namespace BowieD.Unturned.NPCMaker.Updater
                         WriteLine($"Downloading new version...", ConsoleColor.White);
                         using (WebClient client = new WebClient())
                         {
-                            client.DownloadFile(manifest?.assets[0].browser_download_url, args[0]);
+                           client.DownloadFile(manifest?.assets[0].browser_download_url, args[0]);
                         }
                         WriteLine($"Downloaded!", ConsoleColor.White);
-                        WriteLine($"Launching in 3...", ConsoleColor.White);
-                        Thread.Sleep(1000);
-                        WriteLine($"Launching in 2...", ConsoleColor.White);
-                        Thread.Sleep(1000);
-                        WriteLine($"Launching in 1...", ConsoleColor.White);
-                        Thread.Sleep(1000);
                         System.Diagnostics.Process.Start(args[0]);
                         return;
                     }
@@ -69,8 +64,8 @@ namespace BowieD.Unturned.NPCMaker.Updater
                 {
                     WriteLine($"FAILED: Exception: {ex.Message}", ConsoleColor.Red);
                 }
-                WriteLine("Trying again in 1 second...", ConsoleColor.White);
-                Thread.Sleep(1000);
+                WriteLine("Trying again in 3 seconds...", ConsoleColor.White);
+                Thread.Sleep(3000);
             }
             WriteLine($"Update failed. Try again later.", ConsoleColor.Red);
             WriteLine($"Press any key to close.", ConsoleColor.White);
